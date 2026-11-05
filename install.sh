@@ -1079,7 +1079,7 @@ start() {
             create_systemd_service
             systemctl start "${SERVICE_NAME}.service"
         else
-            nohup "$PATH_RUST/$PATH_EXEC" >> "$PATH_NOHUP" 2>> "$PATH_ERR" &
+            (cd "$PATH_RUST" && nohup "$PATH_RUST/$PATH_EXEC" >> "$PATH_NOHUP" 2>> "$PATH_ERR" &)
         fi
 
         if wait_for_process_started "$PATH_EXEC" 10; then
@@ -1178,8 +1178,8 @@ enable_autostart() {
         fi
 
         if ! grep -q "$PATH_RUST/$PATH_EXEC" /etc/rc.local; then
-            sed -i "/^exit 0/i ${PATH_RUST}/${PATH_EXEC} >> ${PATH_NOHUP} 2>> ${PATH_ERR} &" /etc/rc.local 2>/dev/null || \
-                echo "${PATH_RUST}/${PATH_EXEC} >> ${PATH_NOHUP} 2>> ${PATH_ERR} &" >> /etc/rc.local
+            sed -i "/^exit 0/i (cd '${PATH_RUST}' && '${PATH_RUST}/${PATH_EXEC}' >> '${PATH_NOHUP}' 2>> '${PATH_ERR}' &)" /etc/rc.local 2>/dev/null || \
+                echo "(cd '${PATH_RUST}' && '${PATH_RUST}/${PATH_EXEC}' >> '${PATH_NOHUP}' 2>> '${PATH_ERR}' &)" >> /etc/rc.local
         fi
         chmod +x /etc/rc.local
     fi
@@ -1594,7 +1594,7 @@ start_app() {
         mkdir -p "\$APP_DIR"
         touch "\$NOHUP_FILE" "\$ERR_FILE"
         chmod 640 "\$NOHUP_FILE" "\$ERR_FILE" 2>/dev/null || true
-        nohup "\$APP_PATH" >> "\$NOHUP_FILE" 2>> "\$ERR_FILE" &
+        (cd "\$APP_DIR" && nohup "\$APP_PATH" >> "\$NOHUP_FILE" 2>> "\$ERR_FILE" &)
     fi
 
     i=0
