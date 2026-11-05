@@ -1162,7 +1162,12 @@ kill_process() {
         echo "${msg_process_terminated} $process_name ."
     else
         echo "${msg_stop_timeout}: $process_name ."
-        return 1
+        for pid in "${pids[@]}"; do
+            if [ "$(cat "/proc/$pid/comm" 2>/dev/null)" = "$process_name" ]; then
+                kill -KILL "$pid" 2>/dev/null || true
+            fi
+        done
+        wait_for_process_stopped "$process_name" 5
     fi
 }
 
@@ -1644,6 +1649,17 @@ stop_app() {
         i=\$((i + 1))
     done
 
+    for pid in \$(pgrep -x "\$APP_EXEC"); do
+        if [ "\$(cat "/proc/\$pid/comm" 2>/dev/null)" = "\$APP_EXEC" ]; then
+            kill -KILL "\$pid" 2>/dev/null || true
+        fi
+    done
+    i=0
+    while [ "\$i" -lt 5 ]; do
+        if ! is_running; then echo "$text_stopped"; return 0; fi
+        sleep 1
+        i=\$((i + 1))
+    done
     echo "$text_stop_timeout"
     return 1
 }
