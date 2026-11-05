@@ -1,10 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 export TERM=xterm
-trap 'cat /tmp/dc-install.log /tmp/dc-cli.log /root/DCMiner/err.log 2>/dev/null || true' ERR
+trap 'cat /tmp/dc-install.log /tmp/dc-cli.log /root/DCMiner/err.log /root/DCMiner/nohup.out /root/DCMiner/rust-config 2>/dev/null || true; ps aux; ss -ltnp' ERR
 bash -n /src/install.sh
 # Use the exact published entry point, not a modified installer.
 curl -fLsS --retry 5 "https://raw.githubusercontent.com/huang199800/DCMiner/main/install.sh?verify=$(date +%s)" -o /tmp/public-install.sh
+for attempt in $(seq 1 12); do
+  if cmp -s /tmp/public-install.sh /src/install.sh; then break; fi
+  sleep 5
+  curl -fLsS --retry 3 "https://raw.githubusercontent.com/huang199800/DCMiner/main/install.sh?verify=$(date +%s)" -o /tmp/public-install.sh
+done
 cmp /tmp/public-install.sh /src/install.sh
 printf '2\n1\n' | bash /tmp/public-install.sh > /tmp/dc-install.log 2>&1
 test -x /root/DCMiner/DCMiner
