@@ -59,7 +59,7 @@ jobs:
           persist-credentials: false
       - name: Install and verify inside isolated Ubuntu container
         run: |
-          docker run --rm -e TERM=xterm -v "$PWD:/src:ro" ubuntu:${{ matrix.ubuntu }} bash -c '
+          docker run --rm --init -e TERM=xterm -v "$PWD:/src:ro" ubuntu:${{ matrix.ubuntu }} bash -c '
             set -e
             apt-get update -qq
             DEBIAN_FRONTEND=noninteractive apt-get install -y -qq curl wget ca-certificates procps iproute2
