@@ -1,0 +1,68 @@
+name: Publish and verify DCMiner
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/release.yml'
+      - 'release-manifest.json'
+      - 'install.sh'
+      - 'tests/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: dcminer-release
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Download and verify pinned migration assets
+        run: |
+          mkdir -p dist
+          python3 - <<'PY'
+          import json, hashlib, pathlib, subprocess
+          m=json.loads(pathlib.Path('release-manifest.json').read_text())
+          sums=[]
+          for a in m['assets']:
+              p=pathlib.Path('dist')/a['name']
+              subprocess.run(['curl','-fLsS','--retry','5','--connect-timeout','20',a['url'],'-o',str(p)],check=True)
+              assert hashlib.sha256(p.read_bytes()).hexdigest()==a['sha256'], 'Asset hash mismatch'
+              sums.append(a['sha256']+'  '+a['name'])
+          pathlib.Path('dist/SHA256SUMS').write_text('\n'.join(sums)+'\n')
+          PY
+          bash -n install.sh
+          bash -n tests/install-smoke.sh
+      - name: Publish release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if ! gh release view v6.4.2 >/dev/null 2>&1; then
+            gh release create v6.4.2 --target "$GITHUB_SHA" --title 'DCMiner 6.4.2' --notes 'Linux x86_64 定制发行版。安装脚本位于本仓库 install.sh；主程序及 CLI 原始文件经 SHA256 校验迁移至本 Release。'
+          fi
+          gh release upload v6.4.2 dist/DCMiner-6.4.2 dist/RustMinerSystemCLI-0.1.0 dist/SHA256SUMS --clobber
+  verify:
+    needs: publish
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        ubuntu: ['22.04', '24.04']
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install and verify inside isolated Ubuntu container
+        run: |
+          docker run --rm -e TERM=xterm -v "$PWD:/src:ro" ubuntu:${{ matrix.ubuntu }} bash -c '
+            set -e
+            apt-get update -qq
+            DEBIAN_FRONTEND=noninteractive apt-get install -y -qq curl wget ca-certificates procps iproute2
+            timeout 300 bash /src/tests/install-smoke.sh
+          '
+
