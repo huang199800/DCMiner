@@ -1756,8 +1756,10 @@ install_cli() {
     fi
 
     show_cli_install_success
-    echo "$msg_cli_launching"
-    "$CLI_LINK_PATH"
+    if [ -t 0 ] && [ -t 1 ]; then
+        echo "$msg_cli_launching"
+        "$CLI_LINK_PATH"
+    fi
 }
 
 remove_cli_tool_files() {
