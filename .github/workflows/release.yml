@@ -45,7 +45,14 @@ jobs:
           if ! gh release view v6.4.2 >/dev/null 2>&1; then
             gh release create v6.4.2 --target "$GITHUB_SHA" --title 'DCMiner 6.4.2' --notes 'Linux x86_64 定制发行版。安装脚本位于本仓库 install.sh；主程序及 CLI 原始文件经 SHA256 校验迁移至本 Release。'
           fi
-          gh release upload v6.4.2 dist/DCMiner-6.4.2 dist/RustMinerSystemCLI-0.1.0 dist/SHA256SUMS --clobber
+          mkdir -p published
+          for asset in DCMiner-6.4.2 RustMinerSystemCLI-0.1.0 SHA256SUMS; do
+            if gh release download v6.4.2 --pattern "$asset" --dir published; then
+              cmp "dist/$asset" "published/$asset"
+            else
+              gh release upload v6.4.2 "dist/$asset"
+            fi
+          done
   verify:
     needs: publish
     runs-on: ubuntu-24.04
