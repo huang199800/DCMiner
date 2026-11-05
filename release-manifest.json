@@ -1,0 +1,16 @@
+{
+  "version": "6.4.2",
+  "assets": [
+    {
+      "name": "DCMiner-6.4.2",
+      "url": "https://shortcut.rustminersystem.com/Readme/124/linux/DCMiner-6.4.2",
+      "sha256": "20d19d650a545499c0981d7817c523588e2ffaab32f0a433bd8fea983c40159d"
+    },
+    {
+      "name": "RustMinerSystemCLI-0.1.0",
+      "url": "https://raw.githubusercontent.com/EvilGenius-dot/RustMinerSystem/main/CLI/RustMinerSystemCLI-0.1.0",
+      "sha256": "0e086d8369d4f8877a952de25f1eb8d3ca86568fe8e2bc7c30fb7b20d3adcc00"
+    }
+  ]
+}
+
