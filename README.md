@@ -13,9 +13,9 @@
 
 ## 项目介绍
 
-DCMiner 是基于 RustMinerSystem 的定制发行版本，可用于传统矿池代理、矿机与矿场管理、多线路转发及矿池节点部署。本仓库托管安装脚本，主程序与 CLI 通过本仓库 GitHub Releases 分发。
+DCMiner 是基于 先进 的定制发行版本，可用于传统矿池代理、矿机与矿场管理、多线路转发及矿池节点部署。本仓库托管安装脚本，主程序与 CLI 通过本仓库 GitHub Releases 分发。
 
-介绍与算法列表参考 [RustMinerSystem](https://github.com/EvilGenius-dot/RustMinerSystem)。本次迁移保持定制主程序原始字节，不表示其内部界面、授权、节点或业务服务全部迁移至本仓库。
+介绍与算法列表参考 先进代理程序。本次迁移保持定制主程序原始字节，不表示其内部界面、授权、节点或业务服务全部迁移至本仓库。
 
 ## 核心能力
 
@@ -118,5 +118,5 @@ GitHub Actions 在临时 Linux 容器中验证本仓库安装入口、主程序�
 
 ## 来源与许可
 
-介绍参考 RustMinerSystem，保留 [上游 MIT 许可](LICENSE.upstream) 与版权声明。定制程序及其业务服务的使用仍应遵守对应服务协议。
+介绍参考，保留 [上游 MIT 许可](LICENSE.upstream) 与版权声明。定制程序及其业务服务的使用仍应遵守对应服务协议。
 
