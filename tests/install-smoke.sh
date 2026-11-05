@@ -4,7 +4,7 @@ export TERM=xterm
 trap 'cat /tmp/dc-install.log /tmp/dc-cli.log /root/DCMiner/err.log 2>/dev/null || true' ERR
 bash -n /src/install.sh
 # Use the exact published entry point, not a modified installer.
-curl -fLsS --retry 5 https://raw.githubusercontent.com/huang199800/DCMiner/main/install.sh -o /tmp/public-install.sh
+curl -fLsS --retry 5 "https://raw.githubusercontent.com/huang199800/DCMiner/main/install.sh?verify=$(date +%s)" -o /tmp/public-install.sh
 cmp /tmp/public-install.sh /src/install.sh
 printf '2\n1\n' | bash /tmp/public-install.sh > /tmp/dc-install.log 2>&1
 test -x /root/DCMiner/DCMiner
